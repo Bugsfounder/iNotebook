@@ -1,14 +1,55 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User')
+const User = require('../models/User');
+const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-// CREATE A USER USING: POST "/api/auth" DOESN'T REQUIRE AUTH
+const JWT_SECRET = 'manishaisagoodg$irl';
 
-router.post('/', (req, res) => {
-    console.log(req.body);
-    const user = User(req.body);
-    user.save();
-    res.send(req.body);
-});
+// CREATE A USER USING: POST "/api/auth/createuser". No Login Required
+router.post('/createuser', [
+    body('name', "Enter a Valid Name").isLength({ min: 3 }),
+    body('email', "Enter a Valid Email").isEmail(),
+    body('password', "Enter a Valid Password").isLength({ min: 5 }),
+    body('phone', "Enter a Valid Phone").isMobilePhone()
+],
+    // MAKE FUNTIIN ASYNC BECAUSE WE HAVE TO WAIT INSIDE THIS FUNCTION FOR CREATE USER AND OTHER THIS LIKE THSI
+    async (req, res) => {
+        // IF THERE IS ERRORS, RETURN BAD REQUEST AND THE ERRORS 
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        // CHECK WHETHER THE USER WITH THE SAME EMAIL EXISTS ALREADY
+        try {
+            let user = await User.findOne({ email: req.body.email });
+            if (user) {
+                return res.status(400).json({ error: "Email Already Exists" })
+            }
+
+            const salt = await bcrypt.genSalt(10)
+            const seqPass = await bcrypt.hash(req.body.password, salt);
+            // CREATE A NEW USER AND INSERT INTO DATABASE NOTE:- WAIT FOR CREATE USING AWAIT
+            user = await User.create({
+                name: req.body.name,
+                email: req.body.email,
+                phone: req.body.phone,
+                password: seqPass
+            });
+            const data = {
+                user: {
+                    id: user.id
+                }
+            }
+            const authToken = jwt.sign(data, JWT_SECRET);
+
+            res.json({ authToken });
+
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send("some error occured");
+        }
+    });
 
 module.exports = router;
