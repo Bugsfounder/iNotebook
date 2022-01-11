@@ -1,22 +1,20 @@
 import './App.css';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, } from "react-router-dom";
 import Navbar from './components/Navbar';
 import { About } from './components/About';
 import { Home } from './components/Home';
-import NoteState, { ManishaState } from './context/notes/NoteState';
-
+import NoteState from './context/notes/NoteState';
+// import { ManishaState } from './context/notes/NoteState';
 
 function App () {
   return (
-    <ManishaState>
-      <NoteState>
-        <>
-          <Router>
-            <Navbar />
+    // <ManishaState>
+    <NoteState>
+      <>
+        <Router>
+          <Navbar />
+          <div className="container">
+
             <Switch>
 
               <Route exact path="/">
@@ -29,11 +27,12 @@ function App () {
 
             </Switch>
 
-          </Router>
+          </div>
+        </Router>
 
-        </>
-      </NoteState>
-    </ManishaState>
+      </>
+    </NoteState>
+    // </ManishaState>
   );
 }
 
