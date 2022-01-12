@@ -17,18 +17,21 @@ router.post('/createuser', [
 ],
     // MAKE FUNTIIN ASYNC BECAUSE WE HAVE TO WAIT INSIDE THIS FUNCTION FOR CREATE USER AND OTHER THIS LIKE THSI
     async (req, res) => {
+        let success = false
         // IF THERE IS ERRORS, RETURN BAD REQUEST AND THE ERRORS 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            success = false
             return res.status(400).json({ errors: errors.array() });
         }
         // CHECK WHETHER THE USER WITH THE SAME EMAIL EXISTS ALREADY
         try {
             let user = await User.findOne({ email: req.body.email });
             if (user) {
+                success = false
                 return res.status(400).json({ error: "Email Already Exists" })
             }
-
+            success = true
             const salt = await bcrypt.genSalt(10)
             const seqPass = await bcrypt.hash(req.body.password, salt);
             // CREATE A NEW USER AND INSERT INTO DATABASE NOTE:- WAIT FOR CREATE USING AWAIT
@@ -44,9 +47,10 @@ router.post('/createuser', [
                 }
             }
             const authToken = jwt.sign(data, JWT_SECRET);
-            res.json({ authToken });
+            res.json({ success, authToken });
 
         } catch (error) {
+            success = false
             console.error(error.message);
             res.status(500).send("Internal Server Error Occured");
         }
