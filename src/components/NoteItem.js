@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react';
+import NoteContext from "../context/notes/NoteContext";
 
 function NoteItem (props) {
-    let { title, description, tag, dateTime } = props.note;
+    const context = useContext(NoteContext);
+    const { deleteNote } = context;
+    let { title, description, dateTime, _id, } = props.note;
 
     let options = {
         weekday: "long", year: "numeric", month: "short",
@@ -13,14 +16,17 @@ function NoteItem (props) {
         <div className="col">
             <div className="card">
                 <div className="card-body">
-                    <h5 className="card-title">{title}</h5>
+                    <h5 className="card-title">{title}
+                        <i className="fas fa-edit mx-5" onClick={() => props.updateNote(props.note)}></i>
+                        <i className="fas fa-trash-alt" onClick={() => deleteNote(_id)}></i>
+                    </h5>
                     <p className="card-text">{description}</p>
                 </div>
                 <div className="card-footer">
                     <small className="text-muted">{date} </small>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 

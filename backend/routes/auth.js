@@ -60,7 +60,9 @@ router.post('/login', [
 ], async (req, res) => {
     // IF THERE IS ERRORS, RETURN BAD REQUEST AND THE ERRORS 
     const errors = validationResult(req);
+    let success = false
     if (!errors.isEmpty()) {
+        success = false
         return res.status(400).json({ errors: errors.array() });
     }
 
@@ -68,10 +70,12 @@ router.post('/login', [
     try {
         let user = await User.findOne({ email });
         if (!user) {
+            success = false
             return res.status(400).json({ error: "Please Try to login with correct credentials" });
         }
         const passwordCompare = await bcrypt.compare(password, user.password);
         if (!passwordCompare) {
+            success = false
             return res.status(400).json({ error: "Please try to login with correct credentials" });
         }
 
@@ -81,7 +85,8 @@ router.post('/login', [
             }
         }
         const authToken = jwt.sign(data, JWT_SECRET);
-        res.json({ authToken });
+        success = true;
+        res.json({ success, authToken });
 
     } catch (error) {
         console.error(error.message);

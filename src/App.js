@@ -4,15 +4,17 @@ import Navbar from './components/Navbar';
 import { About } from './components/About';
 import { Home } from './components/Home';
 import NoteState from './context/notes/NoteState';
-// import { ManishaState } from './context/notes/NoteState';
+import Alert from './components/Alert';
+import Login from './components/Login';
+import Signup from './components/Signup';
 
 function App () {
   return (
-    // <ManishaState>
     <NoteState>
       <>
         <Router>
           <Navbar />
+          <Alert message="Successfully Done Your Action" />
           <div className="container">
 
             <Switch>
@@ -25,6 +27,14 @@ function App () {
                 <About />
               </Route>
 
+              <Route exact path="/login">
+                <Login />
+              </Route>
+
+              <Route exact path="/signup">
+                <Signup />
+              </Route>
+
             </Switch>
 
           </div>
@@ -32,7 +42,6 @@ function App () {
 
       </>
     </NoteState>
-    // </ManishaState>
   );
 }
 
