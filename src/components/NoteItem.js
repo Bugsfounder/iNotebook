@@ -17,8 +17,14 @@ function NoteItem (props) {
             <div className="card">
                 <div className="card-body">
                     <h5 className="card-title">{title}
-                        <i className="fas fa-edit mx-5" onClick={() => props.updateNote(props.note)}></i>
-                        <i className="fas fa-trash-alt" onClick={() => deleteNote(_id)}></i>
+                        <i className="fas fa-edit mx-5" onClick={() => {
+                            props.updateNote(props.note)
+                            props.showAlert("Note Updated Successfully", "success");
+                        }}></i>
+                        <i className="fas fa-trash-alt" onClick={() => {
+                            deleteNote(_id);
+                            props.showAlert("Note Deleted Successfully", "success");
+                        }}></i>
                     </h5>
                     <p className="card-text">{description}</p>
                 </div>
